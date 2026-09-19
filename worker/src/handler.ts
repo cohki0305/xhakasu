@@ -12,7 +12,15 @@ const json = (status: number, body: unknown) =>
 
 const utcDate = () => new Date().toISOString().slice(0, 10);
 
-export async function handle(req: Request, env: Env, today: () => string = utcDate): Promise<Response> {
+/** defer に ctx.waitUntil を渡すと、KV への書き込みを返事の後に回せる。省略時（テスト）は返事の前に待つ */
+export async function handle(
+  req: Request,
+  env: Env,
+  today: () => string = utcDate,
+  defer?: (p: Promise<unknown>) => void,
+): Promise<Response> {
+  const waiting: Promise<unknown>[] = [];
+  const later = defer ?? ((p: Promise<unknown>) => void waiting.push(p));
   const url = new URL(req.url);
   if (req.method !== "POST" || url.pathname !== "/classify") return json(404, { error: "not_found" });
 
@@ -55,7 +63,7 @@ export async function handle(req: Request, env: Env, today: () => string = utcDa
   if (misses.length > 0 && toAsk.length === 0 && Object.keys(out.results).length === 0) {
     return json(429, { error: "daily_limit" });
   }
-  if (toAsk.length > 0) await env.KV.put(countKey, String(used + toAsk.length), { expirationTtl: COUNT_TTL });
+  if (toAsk.length > 0) later(env.KV.put(countKey, String(used + toAsk.length), { expirationTtl: COUNT_TTL }));
 
   // 5. Jev（台帳にない分だけ、並列）
   await Promise.all(
@@ -63,7 +71,7 @@ export async function handle(req: Request, env: Env, today: () => string = utcDa
       try {
         const verdict = toVerdict(await env.AI.run(JEV_MODEL, { state: m.text, questions }));
         out.results[m.id] = verdict;
-        await env.KV.put(`cache:${m.key}`, JSON.stringify(verdict), { expirationTtl: CACHE_TTL });
+        later(env.KV.put(`cache:${m.key}`, JSON.stringify(verdict), { expirationTtl: CACHE_TTL }).catch(() => {}));
       } catch {
         out.errors[m.id] = "jev_failed";
       }
@@ -73,5 +81,6 @@ export async function handle(req: Request, env: Env, today: () => string = utcDa
   // posts の順に並べ直して返す（テストと読みやすさのため）
   const ordered: ClassifyResponse = { results: {}, errors: out.errors };
   for (const p of posts) if (out.results[p.id]) ordered.results[p.id] = out.results[p.id]!;
+  await Promise.all(waiting);
   return json(200, ordered);
 }
