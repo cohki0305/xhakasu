@@ -3,6 +3,14 @@
 - 承認済み提案: https://claude.ai/artifact/Q5X6vAMPYsk8Fv8RdjSCVA （2026-09-19 承認）
 - 対象: X（x.com）のタイムラインを意味で仕分ける Chrome 拡張と、その中継 Worker
 
+## 承認後の変更（2026-09-19）
+
+- 非表示にした投稿は、初期設定では**理由と確率つきのバー**に置き換え、バーを押すとその場で開ける。跡を残さず消す動作は設定 `hiddenStyle: "remove"` で選べる。消してしまうと判定の精度を確かめられない、という理由で当初の「跡を残さない」から変更した。
+- 設定画面とポップアップは React + Tailwind v4 + shadcn/ui で作る（当初は素の HTML）。
+- 用語は「合言葉」→「アクセスキー」、「受付 URL」→「サーバー URL」。
+
+以下の本文は、この変更を反映済み。
+
 ## 目的
 
 見たいジャンルの投稿だけをタイムラインに残す。オプションで、攻撃的な投稿と性的な投稿を非表示にする。判定には Cloudflare Workers AI の分類モデル `typesafe/jev` を使う。
@@ -36,7 +44,7 @@ API トークンは拡張に入れない。Worker の AI binding を使うので
 | `extension/` | Manifest V3 の Chrome 拡張 |
 | `worker/` | 中継 Worker（wrangler） |
 
-言語は TypeScript、ビルドとテストは bun。設定画面とポップアップはフレームワークなしの HTML。
+言語は TypeScript、ビルドとテストは bun。設定画面とポップアップは `extension/ui/` に React + Tailwind v4 + shadcn/ui で書く。X のページで動く content script には React を持ち込まない。
 
 ## shared/
 
@@ -49,6 +57,7 @@ type Settings = {
   hideOffensive: boolean
   hideSexual: boolean
   strictness: 'loose' | 'normal' | 'strict'
+  hiddenStyle: 'bar' | 'remove'   // 初期値 'bar'
   relayUrl: string
   accessKey: string
   paused: boolean
@@ -93,7 +102,8 @@ type Settings = {
 
 - `pending`: 本文を半透明＋ぼかしにする。
 - `shown`: 通常表示。
-- `hidden`: 投稿 1 件を包む外側の枠（`[data-testid="cellInnerDiv"]`）を `display: none` にする。跡は残さず、開き直す手段も置かない。
+- `hidden`（`hiddenStyle: "bar"`）: 外側の枠（`[data-testid="cellInnerDiv"]`）の中身を隠し、枠の `::before` に「非表示: ジャンル外（政治 0.91）」のような理由と確率を出す。文言は枠の属性 `data-xhk-label` に載せ、CSS の `attr()` で読む。X の DOM には要素を足さない（React の再描画と衝突しないため）。バーのクリック、または Enter / Space で `data-xhk-open` を切り替え、その場で中身を開閉する。中身が隠れている間、枠そのものが `target` になるクリックはバーのクリックだけなので、それで判定する。
+- `hidden`（`hiddenStyle: "remove"`）: 外側の枠を `display: none` にする。跡は残らない。
 - `unjudged`: 通常表示に戻し、小さく「未判定」と付ける。
 
 `hidden` にしたとき X が高さを測り直して詰めるかは実機で確かめる。詰まらない場合は高さ 0 ＋ `overflow: hidden` に切り替える。
@@ -116,7 +126,7 @@ type Settings = {
 
 ### 設定画面とポップアップ
 
-- 設定画面（options）: ジャンルの追加・編集・削除と `wanted` の切り替え、非表示オプション 2 つ（「攻撃的な投稿を非表示にする」「性的な投稿を非表示にする」）、判定の厳しさ、受付 URL、アクセスキー。
+- 設定画面（options）: ジャンルの追加・編集・削除と `wanted` の切り替え、非表示オプション 2 つ（「攻撃的な投稿を非表示にする」「性的な投稿を非表示にする」）、非表示にした投稿の見せ方（バーを残す／完全に消す）、判定の厳しさ、サーバー URL、アクセスキー。保存前の入力チェックは `validateSettings` に切り出してテストする。
 - ポップアップ: 一時停止スイッチ、今日の理由別の件数（ジャンル外・攻撃的・性的）、直近のエラー。
 - 消した投稿の本文は記録しない。件数だけを `chrome.storage.local` に日付つきで持つ。
 - 設定は `chrome.storage.sync`（アクセスキーだけは `local`）。変更は `storage.onChanged` で content script に即時反映し、保持している確率から `decide` をやり直す。
@@ -153,7 +163,7 @@ Worker は Jev の返り値を上の最小形に詰め直して返す。`decide`
 
 ### CORS
 
-拡張の background から呼ぶので CORS ヘッダーは不要。manifest の `host_permissions` に受付 URL を入れる。
+拡張の background から呼ぶので CORS ヘッダーは不要。manifest の `host_permissions` にサーバー URL を入れる。
 
 ## テスト
 
@@ -190,6 +200,6 @@ Worker は Jev の返り値を上の最小形に詰め直して返す。`decide`
 - Chrome ウェブストアでの公開
 - X への操作（ミュート、ブロック、通報）
 - スマホ対応
-- 消した投稿の履歴、その場で開き直す機能
+- 消した投稿の本文を保存する履歴
 - 各自のトークンで Cloudflare を直接呼ぶモード
 - X の内部通信の横取りによる先読み（待ち時間が問題になったら再検討）

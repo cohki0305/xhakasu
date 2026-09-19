@@ -27,6 +27,15 @@ export function mergeSettings(sync: unknown, local: unknown): Settings {
   };
 }
 
+/** 保存してよければ null、だめなら利用者に見せる文言を返す */
+export function validateSettings(s: Settings): string | null {
+  if (s.genres.some((g) => !g.name.trim() || !g.description.trim())) {
+    return "名前か説明文が空のジャンルがあります。入力するか削除してください。";
+  }
+  if (s.relayUrl && !/^https:\/\/\S+$/.test(s.relayUrl)) return "サーバー URL は https:// から始まる形で入力してください。";
+  return null;
+}
+
 export async function loadSettings(): Promise<Settings> {
   const [sync, local] = await Promise.all([chrome.storage.sync.get("settings"), chrome.storage.local.get("accessKey")]);
   return mergeSettings(sync.settings, local.accessKey);

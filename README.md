@@ -11,10 +11,10 @@ X のタイムラインから、見たいジャンル以外の投稿と（オプ
 1. 受け取った zip を展開する。
 2. Chrome で `chrome://extensions` を開き、右上の「デベロッパーモード」をオンにする。
 3. 「パッケージ化されていない拡張機能を読み込む」で、展開したフォルダを選ぶ。
-4. 拡張のアイコン →「設定を開く」で、受け取った**受付 URL** と**アクセスキー**を入れて保存する。
-5. x.com を開く。投稿は一瞬薄くなり、判定が終わると表示されるか消える。
+4. 拡張のアイコン →「設定を開く」で、受け取った**サーバー URL** と**アクセスキー**を入れて保存する。
+5. x.com を開く。投稿は一瞬薄くなり、判定が終わると表示されるか、「非表示: ジャンル外（政治 0.91）」のような細いバーに変わる。バーを押すとその場で中身を見られる。数字は判定の確率。
 
-消えすぎていると感じたら、アイコンから今日の件数を確かめ、「一時停止」で全部表示に戻して見比べる。
+判定に納得できたら、設定の「非表示にした投稿の見せ方」を「完全に消す」にするとバーも出なくなる。非表示が多すぎると感じたら「判定の厳しさ」を「ゆるめ」にするか、ジャンルの説明文を具体的に書き直す。
 
 ## 管理者向け
 
@@ -27,7 +27,7 @@ bun run deploy:worker    # 中継 Worker をデプロイ
 
 配布用 zip: `bun run pack`（`xhakasu.zip` ができる。git 管理外）
 
-デプロイすると `https://xhakasu-relay.<あなたのサブドメイン>.workers.dev` が受付 URL になる。Cloudflare のアカウント ID は `.secrets/cloudflare-account-id.txt`（git 管理外）に 1 行で置き、`worker/wrangler.jsonc` の `kv_namespaces[0].id` は自分のものに書き換える（KV は `bunx wrangler kv namespace create xhakasu` で作る）。発行したアクセスキーは git に入れない（`.secrets/` は管理外）。
+デプロイすると `https://xhakasu-relay.<あなたのサブドメイン>.workers.dev` がサーバー URL になる。Cloudflare のアカウント ID は `.secrets/cloudflare-account-id.txt`（git 管理外）に 1 行で置き、`worker/wrangler.jsonc` の `kv_namespaces[0].id` は自分のものに書き換える（KV は `bunx wrangler kv namespace create xhakasu` で作る）。発行したアクセスキーは git に入れない（`.secrets/` は管理外）。
 
 アクセスキーの発行（1 人 1 本。`dailyLimit` は 1 日に Jev を呼べる回数）:
 

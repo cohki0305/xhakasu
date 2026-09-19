@@ -2,26 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<style>
-  body { font: 13px/1.6 system-ui, sans-serif; width: 240px; margin: 0; padding: 14px; color: #151924; }
-  h1 { font-size: 14px; margin: 0 0 10px; }
-  dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; margin: 10px 0; }
-  dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
-  #error { color: #a8352b; margin: 8px 0 0; }
-  a { color: #2b4fcb; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xhakasu</title>
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
-  <h1>xhakasu</h1>
-  <label><input type="checkbox" id="paused"> 一時停止（すべて表示する）</label>
-  <dl>
-    <dt>今日、非表示にした投稿</dt><dd id="total">0</dd>
-    <dt>　ジャンル外</dt><dd id="genre">0</dd>
-    <dt>　攻撃的</dt><dd id="offensive">0</dd>
-    <dt>　性的</dt><dd id="sexual">0</dd>
-  </dl>
-  <p id="error" role="alert" hidden></p>
-  <a href="#" id="openOptions">設定を開く</a>
+  <div id="root"></div>
   <script src="popup.js"></script>
 </body>
 </html>

@@ -2,41 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>xhakasu の設定</title>
-<style>
-  body { font: 14px/1.7 system-ui, sans-serif; max-width: 720px; margin: 32px auto; padding: 0 16px; color: #151924; }
-  h1 { font-size: 20px; } h2 { font-size: 15px; margin-top: 28px; }
-  .genre { display: grid; grid-template-columns: auto 10em 1fr auto; gap: 8px; align-items: center; margin-bottom: 6px; }
-  input[type="text"], input[type="url"], input[type="password"] { font: inherit; padding: 4px 8px; width: 100%; box-sizing: border-box; }
-  label { display: block; margin: 4px 0; }
-  .row { display: grid; grid-template-columns: 8em 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
-  button { font: inherit; padding: 4px 12px; cursor: pointer; }
-  #status { margin-left: 12px; color: #1c6b50; }
-  .hint { color: #5a6275; font-size: 12.5px; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xhakasu</title>
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
-  <h1>xhakasu の設定</h1>
-
-  <h2>見たいジャンル</h2>
-  <p class="hint">チェックを入れたジャンルの投稿だけを表示します。説明文は判定に使われるので、具体的に書くほど当たります。「その他」は削除できません。</p>
-  <div id="genres"></div>
-  <button type="button" id="add">＋ ジャンルを追加</button>
-
-  <h2>非表示オプション</h2>
-  <label><input type="checkbox" id="hideOffensive"> 攻撃的な投稿を非表示にする</label>
-  <label><input type="checkbox" id="hideSexual"> 性的な投稿を非表示にする</label>
-
-  <h2>判定の厳しさ</h2>
-  <label><input type="radio" name="strictness" value="loose"> ゆるめ（確信が強いときだけ非表示にする）</label>
-  <label><input type="radio" name="strictness" value="normal"> ふつう</label>
-  <label><input type="radio" name="strictness" value="strict"> きびしめ（疑わしければ非表示にする）</label>
-
-  <h2>接続</h2>
-  <div class="row"><label for="relayUrl">受付 URL</label><input type="url" id="relayUrl" placeholder="https://xhakasu-relay.<あなたのサブドメイン>.workers.dev"></div>
-  <div class="row"><label for="accessKey">アクセスキー</label><input type="password" id="accessKey" autocomplete="off"></div>
-
-  <p><button type="button" id="save">保存</button><span id="status" role="status"></span></p>
+  <div id="root"></div>
   <script src="options.js"></script>
 </body>
 </html>

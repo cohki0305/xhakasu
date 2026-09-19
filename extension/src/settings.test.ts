@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { DEFAULT_SETTINGS } from "../../shared/defaults";
-import { mergeSettings } from "./settings";
+import { mergeSettings, validateSettings } from "./settings";
 
 test("何も保存されていなければ初期値", () => {
   expect(mergeSettings(undefined, undefined)).toEqual(DEFAULT_SETTINGS);
@@ -36,4 +36,13 @@ test("壊れた値は初期値で埋める", () => {
   expect(s.genres).toEqual(DEFAULT_SETTINGS.genres);
   expect(s.paused).toBe(false);
   expect(s.accessKey).toBe("");
+});
+
+test("保存前の入力チェック", () => {
+  const ok = { ...DEFAULT_SETTINGS, relayUrl: "https://x.workers.dev", accessKey: "k" };
+  expect(validateSettings(ok)).toBeNull();
+  expect(validateSettings({ ...ok, relayUrl: "" })).toBeNull(); // 未設定のままの保存は許す（ポップアップが案内する）
+  expect(validateSettings({ ...ok, relayUrl: "x.workers.dev" })).toBe("サーバー URL は https:// から始まる形で入力してください。");
+  const blank = { ...ok, genres: [{ id: "g1", name: " ", description: "x", wanted: true }, ...ok.genres] };
+  expect(validateSettings(blank)).toBe("名前か説明文が空のジャンルがあります。入力するか削除してください。");
 });
