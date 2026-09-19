@@ -1,0 +1,23 @@
+[data-xhk-state="hidden"] {
+  display: none !important;
+}
+[data-xhk-state="pending"] article {
+  opacity: 0.15;
+  filter: blur(4px);
+  pointer-events: none;
+}
+[data-xhk-state="unjudged"] article {
+  position: relative;
+}
+[data-xhk-state="unjudged"] article::after {
+  content: "未判定";
+  position: absolute;
+  top: 4px;
+  right: 48px;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  color: #9a6510;
+  background: rgba(224, 176, 96, 0.18);
+  pointer-events: none;
+}
