@@ -1,13 +1,15 @@
 import { canonical } from "../../shared/cache-key";
 import { decide, type DecideSettings } from "../../shared/decide";
 import { buildQuestions } from "../../shared/questions";
-import type { ClassifyResponse, HideReason, PostInput, Verdict } from "../../shared/types";
+import { describeHide } from "../../shared/describe";
+import type { ClassifyResponse, HiddenInfo, HideReason, PostInput, Verdict } from "../../shared/types";
 
 export type PostState = "pending" | "shown" | "hidden" | "unjudged";
 export type SeeContext = { exempt: boolean; skipGenre: boolean };
 export type TrackerDeps = {
   classify(posts: PostInput[]): Promise<ClassifyResponse>;
-  apply(id: string, state: PostState): void;
+  /** hidden のときだけ、理由とバー用の文言が付く */
+  apply(id: string, state: PostState, hidden?: HiddenInfo): void;
   onHidden(reason: HideReason): void;
 };
 type Options = { batchMs?: number; timeoutMs?: number; maxBatch?: number };
@@ -64,7 +66,11 @@ export class Tracker {
       this.counted.add(id);
       this.deps.onHidden(d.reason);
     }
-    this.deps.apply(id, d.action === "hide" ? "hidden" : "shown");
+    if (d.action === "hide") {
+      this.deps.apply(id, "hidden", { reason: d.reason, label: describeHide(verdict, d.reason, this.settings.genres) });
+    } else {
+      this.deps.apply(id, "shown");
+    }
   }
 
   private flush(): void {

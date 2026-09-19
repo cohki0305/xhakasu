@@ -20,6 +20,7 @@ export function mergeSettings(sync: unknown, local: unknown): Settings {
     hideOffensive: bool("hideOffensive"),
     hideSexual: bool("hideSexual"),
     strictness: strict,
+    hiddenStyle: s.hiddenStyle === "remove" ? "remove" : "bar",
     relayUrl: typeof s.relayUrl === "string" ? s.relayUrl : "",
     accessKey: typeof local === "string" ? local : "",
     paused: bool("paused"),

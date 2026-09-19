@@ -24,6 +24,12 @@ test("other が消えていたら末尾に足し、途中にあれば末尾へ�
   expect(moved[1]!.wanted).toBe(false);
 });
 
+test("非表示の見せ方は初期値がバー。remove は保持し、壊れた値はバーに戻す", () => {
+  expect(mergeSettings(undefined, undefined).hiddenStyle).toBe("bar");
+  expect(mergeSettings({ hiddenStyle: "remove" }, "").hiddenStyle).toBe("remove");
+  expect(mergeSettings({ hiddenStyle: "blur" }, "").hiddenStyle).toBe("bar");
+});
+
 test("壊れた値は初期値で埋める", () => {
   const s = mergeSettings({ strictness: "extreme", genres: "x", paused: "yes" }, 123);
   expect(s.strictness).toBe("normal");

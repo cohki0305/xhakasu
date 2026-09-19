@@ -67,6 +67,19 @@ test("見たくないジャンルは hidden、onHidden は ID ごとに 1 回", 
   expect(calls).toHaveLength(1); // 再問い合わせしない
 });
 
+test("hidden のときは理由とバー用の文言を apply に渡す", async () => {
+  respond = async () => ({ results: { "1": { genre: { politics: 0.91, other: 0.09 }, offensive: 0, sexual: 0 } }, errors: {} });
+  const infos: unknown[] = [];
+  const t = new Tracker(
+    { classify: (p) => respond(p), apply: (_id, _state, hidden) => infos.push(hidden), onHidden: () => {} },
+    settings,
+    { batchMs: 5, timeoutMs: 40 },
+  );
+  t.see({ id: "1", text: "a" }, list);
+  await sleep(20);
+  expect(infos).toEqual([undefined, { reason: "genre", label: "ジャンル外（政治 0.91）" }]);
+});
+
 test("skipGenre ならジャンル外でも shown", async () => {
   respond = async () => ({ results: { "1": politics }, errors: {} });
   make().see({ id: "1", text: "a" }, { exempt: false, skipGenre: true });

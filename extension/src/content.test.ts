@@ -71,10 +71,34 @@ test("判定して非表示にし、枠の使い回しと一時停止で印を�
   expect(classified[0]!.type === "classify" && classified[0]!.posts.map((p) => p.id)).toEqual(["1", "2"]);
   expect(sent.filter((m) => m.type === "count")).toEqual([{ type: "count", reason: "genre" }]);
 
+  // バー: 理由と確率が枠の属性に載り、枠そのもののクリックで開閉できる
+  const cell2 = win.document.getElementById("cell-2")!;
+  expect(cell2.getAttribute("data-xhk-label")).toBe("ジャンル外（政治 1.00）");
+  expect(cell2.hasAttribute("data-xhk-open")).toBe(false);
+  cell2.dispatchEvent(new win.MouseEvent("click", { bubbles: true }));
+  expect(cell2.hasAttribute("data-xhk-open")).toBe(true);
+  // 開いた投稿の中のクリックでは閉じない
+  cell2.querySelector("article")!.dispatchEvent(new win.MouseEvent("click", { bubbles: true }));
+  expect(cell2.hasAttribute("data-xhk-open")).toBe(true);
+  cell2.dispatchEvent(new win.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  expect(cell2.hasAttribute("data-xhk-open")).toBe(false);
+
+  // 「完全に消す」に切り替えると、バーの文言は付かず remove の印が付く
+  stored = { ...stored, hiddenStyle: "remove" };
+  onChanged({ settings: {} });
+  await sleep(50);
+  expect(state("2")).toBe("hidden");
+  expect(cell2.getAttribute("data-xhk-style")).toBe("remove");
+  expect(cell2.hasAttribute("data-xhk-label")).toBe(false);
+  stored = { ...stored, hiddenStyle: "bar" };
+  onChanged({ settings: {} });
+  await sleep(50);
+
   // X が枠を使い回し、非表示だった枠から投稿が抜けた
   win.document.getElementById("cell-2")!.innerHTML = "<div>さらに表示</div>";
   await sleep(30);
   expect(state("2")).toBeNull();
+  expect(cell2.hasAttribute("data-xhk-label")).toBe(false); // 前の投稿の文言を残さない
 
   // 同じ枠に別の投稿が入った
   win.document.getElementById("cell-2")!.innerHTML = `<article data-testid="tweet"><a href="/mika/status/5"><time>1m</time></a><div data-testid="tweetText">テックの話</div></article>`;

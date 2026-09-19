@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hideOffensive: true,
   hideSexual: true,
   strictness: "normal",
+  hiddenStyle: "bar",
   relayUrl: "",
   accessKey: "",
   paused: false,
