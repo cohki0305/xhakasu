@@ -8,7 +8,7 @@ async function classify(posts: PostInput[]): Promise<ClassifyReply> {
   if (!s.relayUrl || !s.accessKey) return { ok: false, error: "not_configured" };
   let res: Response;
   try {
-    // 受付 URL が URL として壊れていると new URL が throw する。これも network 扱いにする
+    // サーバー URL が URL として壊れていると new URL が throw する。これも network 扱いにする
     res = await fetch(new URL("/classify", s.relayUrl), {
       method: "POST",
       headers: { Authorization: `Bearer ${s.accessKey}`, "Content-Type": "application/json" },
