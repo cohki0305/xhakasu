@@ -27,7 +27,7 @@ bun run deploy:worker    # 中継 Worker をデプロイ
 
 配布用 zip: `bun run pack`（`xhakasu.zip` ができる。git 管理外）
 
-デプロイすると `https://xhakasu-relay.<あなたのサブドメイン>.workers.dev` が受付 URL になる。`worker/wrangler.jsonc` の `account_id` と `kv_namespaces[0].id` は自分のものに書き換える（KV は `bunx wrangler kv namespace create xhakasu` で作る）。発行したアクセスキーは git に入れない（`.secrets/` は管理外）。
+デプロイすると `https://xhakasu-relay.<あなたのサブドメイン>.workers.dev` が受付 URL になる。Cloudflare のアカウント ID は `.secrets/cloudflare-account-id.txt`（git 管理外）に 1 行で置き、`worker/wrangler.jsonc` の `kv_namespaces[0].id` は自分のものに書き換える（KV は `bunx wrangler kv namespace create xhakasu` で作る）。発行したアクセスキーは git に入れない（`.secrets/` は管理外）。
 
 アクセスキーの発行（1 人 1 本。`dailyLimit` は 1 日に Jev を呼べる回数）:
 

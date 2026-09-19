@@ -6,7 +6,7 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "build:ext": "bun run extension/build.ts",
-    "deploy:worker": "wrangler deploy --config worker/wrangler.jsonc",
+    "deploy:worker": "CLOUDFLARE_ACCOUNT_ID=$(cat .secrets/cloudflare-account-id.txt) wrangler deploy --config worker/wrangler.jsonc",
     "pack": "bun run build:ext && cd extension/dist && python3 -m zipfile -c ../../xhakasu.zip ."
   },
   "devDependencies": {
