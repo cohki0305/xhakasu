@@ -11,5 +11,13 @@ export type DecideSettings = Pick<Settings, "genres" | "hideOffensive" | "hideSe
  * - opts.skipGenre が true ならジャンルは評価しない
  */
 export function decide(verdict: Verdict, settings: DecideSettings, opts: { skipGenre?: boolean } = {}): Decision {
-  throw new Error("decide: 未実装");
+  const harm = HARM_THRESHOLD[settings.strictness];
+  if (settings.hideSexual && verdict.sexual >= harm) return { action: "hide", reason: "sexual" };
+  if (settings.hideOffensive && verdict.offensive >= harm) return { action: "hide", reason: "offensive" };
+  if (opts.skipGenre) return { action: "show" };
+
+  const wanted = settings.genres
+    .filter((g) => g.wanted)
+    .reduce((sum, g) => sum + (verdict.genre[g.id] ?? 0), 0);
+  return wanted < GENRE_THRESHOLD[settings.strictness] ? { action: "hide", reason: "genre" } : { action: "show" };
 }
