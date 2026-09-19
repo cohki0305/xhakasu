@@ -1,0 +1,8 @@
+{
+  "name": "xhakasu-relay",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "ai": { "binding": "AI" },
+  "kv_namespaces": [{ "binding": "KV", "id": "00000000000000000000000000000000" }],
+  "observability": { "enabled": true }
+}
