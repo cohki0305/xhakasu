@@ -7,7 +7,7 @@ export type Settings = {
   hideSexual: boolean;
   strictness: Strictness;
   relayUrl: string;
-  passphrase: string;
+  accessKey: string;
   paused: boolean;
 };
 

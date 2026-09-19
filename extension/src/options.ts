@@ -55,7 +55,7 @@ async function save(): Promise<void> {
   settings.hideSexual = $<HTMLInputElement>("hideSexual").checked;
   settings.strictness = document.querySelector<HTMLInputElement>('input[name="strictness"]:checked')!.value as Strictness;
   settings.relayUrl = $<HTMLInputElement>("relayUrl").value.trim();
-  settings.passphrase = $<HTMLInputElement>("passphrase").value;
+  settings.accessKey = $<HTMLInputElement>("accessKey").value;
   await saveSettings(settings);
   status.textContent = "保存しました。開いている X のタブにすぐ反映されます。";
 }
@@ -67,7 +67,7 @@ async function init(): Promise<void> {
   $<HTMLInputElement>("hideSexual").checked = settings.hideSexual;
   document.querySelector<HTMLInputElement>(`input[name="strictness"][value="${settings.strictness}"]`)!.checked = true;
   $<HTMLInputElement>("relayUrl").value = settings.relayUrl;
-  $<HTMLInputElement>("passphrase").value = settings.passphrase;
+  $<HTMLInputElement>("accessKey").value = settings.accessKey;
   $("add").onclick = addGenre;
   $("save").onclick = () => void save();
 }

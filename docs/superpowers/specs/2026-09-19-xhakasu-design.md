@@ -20,8 +20,8 @@ x.com のページ
   └ content script   投稿の検出・判定待ちの薄隠し・非表示
        │ chrome.runtime.sendMessage
   background         束ねた投稿を Worker へ POST、設定の読み出し
-       │ HTTPS + 合言葉
-  中継 Worker        合言葉の確認 → KV 台帳 → 1 日上限 → Jev 呼び出し
+       │ HTTPS + アクセスキー
+  中継 Worker        アクセスキーの確認 → KV 台帳 → 1 日上限 → Jev 呼び出し
        │ env.AI.run('typesafe/jev', …)
   typesafe/jev
 ```
@@ -50,7 +50,7 @@ type Settings = {
   hideSexual: boolean
   strictness: 'loose' | 'normal' | 'strict'
   relayUrl: string
-  passphrase: string
+  accessKey: string
   paused: boolean
 }
 ```
@@ -116,10 +116,10 @@ type Settings = {
 
 ### 設定画面とポップアップ
 
-- 設定画面（options）: ジャンルの追加・編集・削除と `wanted` の切り替え、非表示オプション 2 つ（「攻撃的な投稿を非表示にする」「性的な投稿を非表示にする」）、判定の厳しさ、受付 URL、合言葉。
+- 設定画面（options）: ジャンルの追加・編集・削除と `wanted` の切り替え、非表示オプション 2 つ（「攻撃的な投稿を非表示にする」「性的な投稿を非表示にする」）、判定の厳しさ、受付 URL、アクセスキー。
 - ポップアップ: 一時停止スイッチ、今日の理由別の件数（ジャンル外・攻撃的・性的）、直近のエラー。
 - 消した投稿の本文は記録しない。件数だけを `chrome.storage.local` に日付つきで持つ。
-- 設定は `chrome.storage.sync`（合言葉だけは `local`）。変更は `storage.onChanged` で content script に即時反映し、保持している確率から `decide` をやり直す。
+- 設定は `chrome.storage.sync`（アクセスキーだけは `local`）。変更は `storage.onChanged` で content script に即時反映し、保持している確率から `decide` をやり直す。
 
 ## worker/
 
@@ -128,7 +128,7 @@ type Settings = {
 `POST /classify`
 
 ```jsonc
-// request  ヘッダー: Authorization: Bearer <合言葉>
+// request  ヘッダー: Authorization: Bearer <アクセスキー>
 { "questions": { … }, "posts": [ { "id": "1234", "text": "…" } ] }   // posts は最大 20 件
 // response
 { "results": { "1234": { "genre": { "tech": 0.87, … }, "offensive": 0.01, "sexual": 0.0 } },
@@ -139,7 +139,7 @@ Worker は Jev の返り値を上の最小形に詰め直して返す。`decide`
 
 ### 処理順
 
-1. 合言葉を KV の `pass:<合言葉>` で引く。値は `{ name, dailyLimit }`。なければ 401。
+1. アクセスキーを KV の `key:<アクセスキー>` で引く。値は `{ name, dailyLimit }`。なければ 401。
 2. `questions` を検証する（3 問の形、ジャンル数 ≤ 20、説明文の長さ ≤ 200 字、本文 ≤ 4,000 字）。
 3. 投稿ごとに `cacheKey` を計算し、KV の `cache:<key>` を引く。
 4. 台帳にない分の件数を、KV の `count:<name>:<YYYY-MM-DD>` に足す。上限を超える分は `errors` に `daily_limit` で返す。全件が上限超過なら 429。
@@ -147,7 +147,7 @@ Worker は Jev の返り値を上の最小形に詰め直して返す。`decide`
 
 件数は KV なので数件ずれうる。目的は暴走の防止であり、厳密さは求めない。
 
-### 合言葉の管理
+### アクセスキーの管理
 
 `wrangler kv key put` / `delete` で発行・無効化する。管理画面は作らない。手順は README に書く。
 

@@ -21,17 +21,17 @@ export function mergeSettings(sync: unknown, local: unknown): Settings {
     hideSexual: bool("hideSexual"),
     strictness: strict,
     relayUrl: typeof s.relayUrl === "string" ? s.relayUrl : "",
-    passphrase: typeof local === "string" ? local : "",
+    accessKey: typeof local === "string" ? local : "",
     paused: bool("paused"),
   };
 }
 
 export async function loadSettings(): Promise<Settings> {
-  const [sync, local] = await Promise.all([chrome.storage.sync.get("settings"), chrome.storage.local.get("passphrase")]);
-  return mergeSettings(sync.settings, local.passphrase);
+  const [sync, local] = await Promise.all([chrome.storage.sync.get("settings"), chrome.storage.local.get("accessKey")]);
+  return mergeSettings(sync.settings, local.accessKey);
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {
-  const { passphrase, ...rest } = settings;
-  await Promise.all([chrome.storage.sync.set({ settings: rest }), chrome.storage.local.set({ passphrase })]);
+  const { accessKey, ...rest } = settings;
+  await Promise.all([chrome.storage.sync.set({ settings: rest }), chrome.storage.local.set({ accessKey })]);
 }

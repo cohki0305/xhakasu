@@ -36,7 +36,7 @@ test("判定して非表示にし、枠の使い回しと一時停止で印を�
   const chromeStub = {
     storage: {
       sync: { get: async () => ({ settings: stored }) },
-      local: { get: async () => ({ passphrase: "pw" }) },
+      local: { get: async () => ({ accessKey: "pw" }) },
       onChanged: { addListener: (fn: typeof onChanged) => (onChanged = fn) },
     },
     runtime: {

@@ -4,8 +4,8 @@ import { loadSettings, saveSettings } from "./settings";
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 const ERROR_TEXT: Record<RelayError, string> = {
-  not_configured: "受付 URL と合言葉が未設定です。設定を開いて入力してください。",
-  unauthorized: "合言葉が違います。設定を確認してください。",
+  not_configured: "受付 URL とアクセスキーが未設定です。設定を開いて入力してください。",
+  unauthorized: "アクセスキーが違います。設定を確認してください。",
   daily_limit: "今日の判定回数の上限に達しました。明日まで、新しい投稿は未判定のまま表示されます。",
   network: "受付に接続できません。受付 URL とネットワークを確認してください。",
   server: "受付でエラーが起きています。しばらくして直らなければ管理者に連絡してください。",

@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hideSexual: true,
   strictness: "normal",
   relayUrl: "",
-  passphrase: "",
+  accessKey: "",
   paused: false,
 };
 

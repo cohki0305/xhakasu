@@ -24,9 +24,9 @@ export async function handle(
   const url = new URL(req.url);
   if (req.method !== "POST" || url.pathname !== "/classify") return json(404, { error: "not_found" });
 
-  // 1. 合言葉
-  const pass = req.headers.get("Authorization")?.match(/^Bearer (.+)$/)?.[1];
-  const holderRaw = pass ? await env.KV.get(`pass:${pass}`) : null;
+  // 1. アクセスキー
+  const accessKey = req.headers.get("Authorization")?.match(/^Bearer (.+)$/)?.[1];
+  const holderRaw = accessKey ? await env.KV.get(`key:${accessKey}`) : null;
   if (!holderRaw) return json(401, { error: "unauthorized" });
   const holder = JSON.parse(holderRaw) as { name: string; dailyLimit: number };
 

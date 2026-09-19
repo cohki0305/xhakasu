@@ -6,12 +6,12 @@ test("何も保存されていなければ初期値", () => {
   expect(mergeSettings(undefined, undefined)).toEqual(DEFAULT_SETTINGS);
 });
 
-test("保存された値で上書きし、合言葉は local から取る", () => {
+test("保存された値で上書きし、アクセスキーは local から取る", () => {
   const s = mergeSettings({ strictness: "strict", hideSexual: false, relayUrl: "https://r.workers.dev" }, "pw");
   expect(s.strictness).toBe("strict");
   expect(s.hideSexual).toBe(false);
   expect(s.relayUrl).toBe("https://r.workers.dev");
-  expect(s.passphrase).toBe("pw");
+  expect(s.accessKey).toBe("pw");
   expect(s.hideOffensive).toBe(true);
 });
 
@@ -29,5 +29,5 @@ test("壊れた値は初期値で埋める", () => {
   expect(s.strictness).toBe("normal");
   expect(s.genres).toEqual(DEFAULT_SETTINGS.genres);
   expect(s.paused).toBe(false);
-  expect(s.passphrase).toBe("");
+  expect(s.accessKey).toBe("");
 });

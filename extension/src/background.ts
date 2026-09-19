@@ -5,13 +5,13 @@ import { loadSettings } from "./settings";
 
 async function classify(posts: PostInput[]): Promise<ClassifyReply> {
   const s = await loadSettings();
-  if (!s.relayUrl || !s.passphrase) return { ok: false, error: "not_configured" };
+  if (!s.relayUrl || !s.accessKey) return { ok: false, error: "not_configured" };
   let res: Response;
   try {
     // 受付 URL が URL として壊れていると new URL が throw する。これも network 扱いにする
     res = await fetch(new URL("/classify", s.relayUrl), {
       method: "POST",
-      headers: { Authorization: `Bearer ${s.passphrase}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${s.accessKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ questions: buildQuestions(s.genres), posts }),
     });
   } catch {

@@ -14,7 +14,7 @@ let aiCalls: unknown[];
 let env: Env;
 
 beforeEach(() => {
-  store = new Map([["pass:secret", JSON.stringify({ name: "koki", dailyLimit: 3 })]]);
+  store = new Map([["key:secret", JSON.stringify({ name: "koki", dailyLimit: 3 })]]);
   aiCalls = [];
   env = {
     KV: { get: async (k) => store.get(k) ?? null, put: async (k, v) => void store.set(k, v) },
@@ -22,18 +22,18 @@ beforeEach(() => {
   };
 });
 
-const post = (posts: { id: string; text: string }[], pass = "secret") =>
+const post = (posts: { id: string; text: string }[], accessKey = "secret") =>
   handle(
     new Request("https://relay.example/classify", {
       method: "POST",
-      headers: { Authorization: `Bearer ${pass}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${accessKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ questions, posts }),
     }),
     env,
     () => "2026-09-19",
   );
 
-test("合言葉が違えば 401、Jev は呼ばない", async () => {
+test("アクセスキーが違えば 401、Jev は呼ばない", async () => {
   const res = await post([{ id: "1", text: "a" }], "wrong");
   expect(res.status).toBe(401);
   expect(aiCalls).toHaveLength(0);

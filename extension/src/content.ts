@@ -77,7 +77,7 @@ async function start(): Promise<void> {
   new MutationObserver(scheduleScan).observe(document.body, { childList: true, subtree: true });
 
   chrome.storage.onChanged.addListener(async (changes) => {
-    if (!changes.settings && !changes.passphrase) return;
+    if (!changes.settings && !changes.accessKey) return;
     settings = await loadSettings();
     tracker.updateSettings(settings);
     clearAll(); // 印を外して再スキャン。Tracker が Verdict を持っていれば問い合わせは起きない
