@@ -6,7 +6,8 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "build:ext": "bun run extension/build.ts",
-    "deploy:worker": "wrangler deploy --config worker/wrangler.jsonc"
+    "deploy:worker": "wrangler deploy --config worker/wrangler.jsonc",
+    "pack": "bun run build:ext && cd extension/dist && python3 -m zipfile -c ../../xhakasu.zip ."
   },
   "devDependencies": {
     "@types/bun": "^1.4.2",

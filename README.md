@@ -25,7 +25,7 @@ bun run build:ext        # extension/dist を作る
 bun run deploy:worker    # 中継 Worker をデプロイ
 ```
 
-配布用 zip: `cd extension/dist && zip -r ../../xhakasu.zip .`
+配布用 zip: `bun run pack`（`xhakasu.zip` ができる。git 管理外）
 
 受付 URL: `https://xhakasu-relay.<subdomain>.workers.dev`（Cloudflare アカウント cohki0305、KV は `xhakasu`）。Koki さん用の合言葉は `.secrets/passphrase-koki.txt`（git 管理外）。
 
